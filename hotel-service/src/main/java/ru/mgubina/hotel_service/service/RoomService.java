@@ -22,7 +22,7 @@ public class RoomService {
 
     private final RoomRepository roomRepository;
     private final HotelRepository hotelRepository;
-    private final IdempotencyService idempotencyService;
+    private final IdempotService idempotService;
     private final RoomDtoMapper roomDtoMapper;
 
     @Transactional
@@ -52,7 +52,7 @@ public class RoomService {
 
     @Transactional
     public boolean confirmAvailability(Long roomId, String requestId) {
-        if (idempotencyService.isProcessed(requestId)) {
+        if (idempotService.isProcessed(requestId)) {
             log.info("Request {} already processed - returning cached result (true)", requestId);
             return true;
         }
@@ -65,7 +65,7 @@ public class RoomService {
             return false;
         }
 
-        idempotencyService.markAsProcessed(requestId);
+        idempotService.markAsProcessed(requestId);
         return true;
     }
 
@@ -78,7 +78,7 @@ public class RoomService {
     @Transactional
     public void incrementTimesBooked(Long roomId, String requestId) {
         String incrementKey = requestId + "-increment";
-        if (idempotencyService.isProcessed(incrementKey)) {
+        if (idempotService.isProcessed(incrementKey)) {
             return;
         }
 
@@ -87,6 +87,6 @@ public class RoomService {
 
         room.setTimesBooked(room.getTimesBooked()+1);
         roomRepository.save(room);
-        idempotencyService.markAsProcessed(incrementKey);
+        idempotService.markAsProcessed(incrementKey);
     }
 }

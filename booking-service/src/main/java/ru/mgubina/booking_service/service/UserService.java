@@ -14,8 +14,6 @@ import ru.mgubina.booking_service.repository.UserRepository;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static java.util.stream.Nodes.collect;
-
 @Service
 @RequiredArgsConstructor
 @Slf4j
