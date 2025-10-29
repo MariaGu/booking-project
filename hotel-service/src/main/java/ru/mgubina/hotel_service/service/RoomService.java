@@ -13,6 +13,8 @@ import ru.mgubina.hotel_service.repository.HotelRepository;
 import ru.mgubina.hotel_service.repository.RoomRepository;
 
 import java.util.List;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @Service
@@ -88,5 +90,18 @@ public class RoomService {
         room.setTimesBooked(room.getTimesBooked()+1);
         roomRepository.save(room);
         idempotService.markAsProcessed(incrementKey);
+    }
+
+    public static class IdempotService {
+
+        private final Set<String> processedRequests = ConcurrentHashMap.newKeySet();
+
+        public boolean isProcessed(String requestId) {
+            return processedRequests.contains(requestId);
+        }
+
+        public void markAsProcessed(String requestId) {
+            processedRequests.add(requestId);
+        }
     }
 }
